@@ -20,7 +20,6 @@ class TaskViewModel extends GetxController {
     TaskType.daily: DailyTaskFactory(),
   };
 
-
   void loadTasks() async
   {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -41,15 +40,16 @@ class TaskViewModel extends GetxController {
         'task', taskList.map((json) => jsonEncode(json)).toList());
   }
 
-  void addTask({required TaskType type, required TaskDTO data}) {
+  void addTask({required TaskType type, required TaskDTO data})
+  {
     final factory = taskFactoryMap[type];
 
     final newTask = factory!.create(data);
     tasks.add(newTask);
     saveTasks();
+    print(tasks);
   }
-}
-//
+
 //   void deleteTask(int index)
 //   {
 //     tasks.removeAt(index);
@@ -99,9 +99,9 @@ class TaskViewModel extends GetxController {
 //     saveTasks();
 //   }
 //
-//   @override
-//   void onInit(){
-//     super.onInit();
-//     loadTasks();
-//   }
-// }
+  @override
+  void onInit(){
+    super.onInit();
+    loadTasks();
+  }
+}

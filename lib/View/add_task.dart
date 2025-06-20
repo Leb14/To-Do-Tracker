@@ -18,7 +18,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   final TextEditingController descriptionController = TextEditingController();
   TaskType selectedTaskType = TaskType.empty;
 
-  final TaskViewModel taskController = Get.put(TaskViewModel());
+  final taskController = Get.find<TaskViewModel>();
 
   void addTask() {
     final taskData = TaskDTO(
@@ -109,7 +109,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   vertical: 0.0,
                 ),
                 child: ElevatedButton(
-                  onPressed: () => {},
+                  onPressed: () => {addTask()},
                   child: Text('Create'),
                 ),
               ),

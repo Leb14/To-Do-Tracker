@@ -53,7 +53,7 @@ class HomeScreen extends StatelessWidget {
                           Expanded(
                             child: CustomButton(
                               label: 'View Tasks',
-                              onPressed: () => Get.to(() => AddTaskScreen()),
+                              onPressed: () => Get.to(() => ViewTaskScreen()),
                               icon: Icons.view_list,
                             ),
                           ),
