@@ -1,0 +1,4 @@
+enum PageRegion {
+  primary,
+  secondary
+}

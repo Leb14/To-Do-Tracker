@@ -5,18 +5,18 @@ packages:
     dependency: transitive
     description:
       name: _fe_analyzer_shared
-      sha256: e55636ed79578b9abca5fecf9437947798f5ef7456308b5cb85720b793eac92f
+      sha256: da0d9209ca76bde579f2da330aeb9df62b6319c834fa7baae052021b0462401f
       url: "https://pub.dev"
     source: hosted
-    version: "82.0.0"
+    version: "85.0.0"
   analyzer:
     dependency: transitive
     description:
       name: analyzer
-      sha256: "904ae5bb474d32c38fb9482e2d925d5454cda04ddd0e55d2e6826bc72f6ba8c0"
+      sha256: "3394478cd571a8dbbe130a35e10bd365a2a8e7a867308142f7fd20336a08c3be"
       url: "https://pub.dev"
     source: hosted
-    version: "7.4.5"
+    version: "7.5.1"
   args:
     dependency: transitive
     description:
@@ -113,6 +113,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.8"
+  darq:
+    dependency: transitive
+    description:
+      name: darq
+      sha256: eb58203f550d113df1984cf6550b94b6951e515bed98eb49d098fb35719c78b0
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
+  directed_graph:
+    dependency: transitive
+    description:
+      name: directed_graph
+      sha256: "6582283519fc08a6a14172d8a3798238f09275a1147e7599baf09c6245e3104a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.5"
+  exception_templates:
+    dependency: transitive
+    description:
+      name: exception_templates
+      sha256: "517f7c770da690073663f867ee2057ae2f4ffb28edae9da9faa624aa29ac76eb"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.1"
   fake_async:
     dependency: transitive
     description:
@@ -162,10 +186,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_riverpod
-      sha256: "92145487d2dd709fe96fa638ec39eff3708ed4d3f0e0c81ecc8a33030e71e10e"
+      sha256: cab35f90d35d556374dd63754984e0558722894400e3d1f66fb7b9a3052e971e
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-dev.15"
+    version: "3.0.0-dev.16"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -248,6 +272,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.2"
+  lakos:
+    dependency: "direct main"
+    description:
+      name: lakos
+      sha256: cdc4d3c1c4a381dfa56ec7cb79fc72381029d831fa51d9b427a4d6fc7a81901c
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.6"
+  lazy_memo:
+    dependency: transitive
+    description:
+      name: lazy_memo
+      sha256: dcb30b4184a6d767e1d779d74ce784d752d38313b8fb4bad6b659ae7af4bb34d
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.3"
   leak_tracker:
     dependency: transitive
     description:
@@ -428,10 +468,10 @@ packages:
     dependency: "direct main"
     description:
       name: protoc_plugin
-      sha256: "32fbf4ac1b1a7263440898c9011209c3a13c9063f326ef78da83734e6f992ff3"
+      sha256: e7f67aa1c79301c673b510241734b3717cc678d0d4e6433910bccb243198d782
       url: "https://pub.dev"
     source: hosted
-    version: "22.3.0"
+    version: "22.4.0"
   pub_semver:
     dependency: transitive
     description:
@@ -440,14 +480,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.0"
+  quote_buffer:
+    dependency: transitive
+    description:
+      name: quote_buffer
+      sha256: "5be4662a87aac8152aa05cdcf467e421aa2edc3b147f069798e2d26539b7ed0a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.7"
   riverpod:
     dependency: transitive
     description:
       name: riverpod
-      sha256: "4369c46c43414a10adbabb8559515d5a35791db2d610e1daab69a2cb292a37f9"
+      sha256: "0aa816ffc79f9762de33ee771f5bedd0bbc8a3dd7960f4893cfde1d18d628f31"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-dev.15"
+    version: "3.0.0-dev.16"
   shared_preferences:
     dependency: "direct main"
     description:

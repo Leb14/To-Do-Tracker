@@ -1,24 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:untitled/View/home_screen.dart';
+import 'package:untitled/View/pages/responsive_home.dart';
+import 'package:untitled/controller/content_controller.dart';
+import 'package:untitled/controller/layout_controller.dart';
+import 'package:untitled/controller/selected_button_controller.dart';
 
-import 'ViewModel/task_view_controller.dart';
+import 'View/navigation/router.dart';
+import 'View/theme/dark_theme.dart';
+import 'controller/theme_controller.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  Get.put(TaskViewModel());
+  Get.put(LayoutRouter());
+  Get.put(ContentController());
+  Get.put(SelectedButtonController());
+  Get.put(LayoutController());
+  Get.put(ThemeController());
+  // Get.put(ScreenController());
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      title: 'Flutter Demo',
-      home: HomeScreen(),
-    );
+    final themeController = Get.find<ThemeController>();
+
+
+    return Obx(() => GetMaterialApp(
+      theme: ThemeData.light(),
+      darkTheme: customDarkTheme,
+      themeMode: themeController.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      home: const ResponsiveHomePage(),
+    ));
   }
 }
