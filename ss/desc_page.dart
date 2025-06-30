@@ -1,6 +1,6 @@
 // import 'package:flutter/material.dart';
 // import 'package:get/get.dart';
-// import 'package:untitled/View/pages/view_detail.dart';
+// import 'package:untitled/View/pages/routed_page.dart';
 //
 // import '../../controller/layout_controller.dart';
 // import '../component/description_pane.dart';

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:untitled/View/pages/pages.dart';
-import 'package:untitled/View/pages/view_detail.dart';
+import 'package:untitled/View/enum/enum_page_region.dart';
+import 'package:untitled/View/pages/placeholder_page.dart';
+import 'package:untitled/View/navigation/routed_page.dart';
+import 'package:untitled/controller/layout_controller.dart';
 import '../navigation/router.dart';
 
 class ResponsiveHomePage extends StatelessWidget {
@@ -10,116 +12,77 @@ class ResponsiveHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final layout = Get.find<LayoutRouter>();
+    final layoutController = Get.find<LayoutController>();
+
+    debugPrint("🔄 ResponsiveHomePage.build called");
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isWide = constraints.maxWidth >= 600;
-        layout.setScreenWidth(isWide); // Replace updateScreenSize
+        layoutController.updateSize(constraints.maxWidth);
+        layout.handleLayoutChangeIfNeeded();
+        final isWide = layoutController.isWide;
 
-        return Obx(() {
-          return layout.isWideScreen
-              ? _buildWideLayout(layout)
-              : _buildNarrowLayout(layout);
-        });
+        return isWide
+            ? _buildWideLayout(layout)
+            : _buildNarrowLayout(layout);
       },
     );
   }
 
   Widget _buildWideLayout(LayoutRouter layout) {
-    final leftPages = layout.logicalStack
-        .where((e) => e.region == PageRegion.left)
-        .toList();
-    final rightPages = layout.logicalStack
-        .where((e) => e.region == PageRegion.right)
-        .toList();
-
     return Row(
       children: [
-        Expanded(
-          child: Navigator(
-            key: layout.firstKey,
-            pages: [
-              if (leftPages.isEmpty)
-                MaterialPage(
-                  key: const ValueKey('home'),
-                  child: RoutedPage(
-                    pageKey: 'home',
-                    region: PageRegion.left,
-                    child: HomePage(region: PageRegion.left),
-                  ),
-                )
-              else
-                ...leftPages.map((item) => MaterialPage(
-                  key: ValueKey(item.pageKey),
-                  child: item.page,
-                )),
-            ],
-            onPopPage: (route, result) {
-              if (!route.didPop(result)) return false;
-              layout.removePageFromStack(
-                  route.settings.name ?? '', PageRegion.left);
-              return true;
-            },
-          ),
-        ),
+        Expanded(child: _buildNavigator(layout, PageRegion.left)),
         const VerticalDivider(width: 1),
-        Expanded(
-          child: Navigator(
-            key: layout.secondKey,
-            pages: [
-              if (rightPages.isEmpty)
-                MaterialPage(
-                  key: const ValueKey('placeholder'),
-                  child: const RoutedPage(
-                    pageKey: 'placeholder',
-                    region: PageRegion.right,
-                    child: PlaceholderPage(title: 'Right Pane'),
-                  ),
-                )
-              else
-                ...rightPages.map((item) => MaterialPage(
-                  key: ValueKey(item.pageKey),
-                  child: item.page,
-                )),
-            ],
-            onPopPage: (route, result) {
-              if (!route.didPop(result)) return false;
-              layout.removePageFromStack(
-                  route.settings.name ?? '', PageRegion.right);
-              return true;
-            },
-          ),
-        ),
+        Expanded(child: _buildNavigator(layout, PageRegion.right)),
       ],
     );
   }
 
   Widget _buildNarrowLayout(LayoutRouter layout) {
-    final pages = layout.logicalStack.toList();
+    return _buildNavigator(layout, PageRegion.left, useMergedStack: true);
+  }
 
-    return Navigator(
-      key: layout.firstKey,
-      pages: [
-        if (pages.isEmpty)
-          MaterialPage(
-            key: const ValueKey('home'),
-            child: RoutedPage(
-              pageKey: 'home',
-              region: PageRegion.left,
-              child: HomePage(region: PageRegion.left),
-            ),
-          )
-        else
-          ...pages.map((item) => MaterialPage(
-            key: ValueKey(item.pageKey),
-            child: item.page,
-          )),
-      ],
-      onPopPage: (route, result) {
-        if (!route.didPop(result)) return false;
-        layout.removePageFromStack(route.settings.name ?? '', PageRegion.left);
-        return true;
-      },
-    );
+  Widget _buildNavigator(LayoutRouter layout, PageRegion region,
+      {bool useMergedStack = false}) {
+    return Obx(() {
+      final pages = useMergedStack
+          ? layout.logicalStack
+          : layout.logicalStack.where((e) => e.region == region).toList();
+
+      final pageList = pages.isEmpty && region == PageRegion.right
+          ? [
+        const MaterialPage(
+          key: ValueKey('placeholder'),
+          child: RoutedPage(
+            pageKey: 'placeholder',
+            region: PageRegion.right,
+            child: PlaceholderPage(title: 'Right Pane'),
+          ),
+        ),
+      ]
+          : pages
+          .map((item) => MaterialPage(
+        key: ValueKey(item.pageKey),
+        child: item.page,
+      ))
+          .toList();
+
+      final navKey =
+      (region == PageRegion.left) ? layout.firstKey : layout.secondKey;
+
+      return Navigator(
+        key: navKey,
+        pages: pageList,
+        onPopPage: (route, result) {
+          if (!route.didPop(result)) return false;
+          layout.removePageFromStack(
+            route.settings.name ?? '',
+            useMergedStack ? PageRegion.left : region,
+          );
+          return true;
+        },
+      );
+    });
   }
 }

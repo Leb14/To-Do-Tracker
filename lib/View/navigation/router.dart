@@ -1,37 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import '../pages/pages.dart';
-import '../pages/view_detail.dart';
-
-enum PageRegion { left, right }
-
-class NavigationItem {
-  final Widget page;
-  final String pageKey;
-  final PageRegion region;
-  final DateTime timestamp;
-
-  NavigationItem({
-    required this.page,
-    required this.pageKey,
-    required this.region,
-    DateTime? timestamp,
-  }) : timestamp = timestamp ?? DateTime.now();
-}
+import 'package:untitled/View/enum/enum_page_region.dart';
+import 'package:untitled/View/navigation/navigation_item.dart';
+import 'package:untitled/View/pages/home_page.dart';
+import 'package:untitled/View/navigation/routed_page.dart';
+import 'package:untitled/controller/layout_controller.dart';
 
 class LayoutRouter extends GetxService {
   final GlobalKey<NavigatorState> firstKey = GlobalKey();
   final GlobalKey<NavigatorState> secondKey = GlobalKey();
 
+  final LayoutController layoutController = Get.find<LayoutController>();
+
+  bool get isWideScreen => layoutController.isWide;
   bool _isTransitioningLayout = false;
 
-  final RxBool _isWideScreen = false.obs;
-  bool get isWideScreen => _isWideScreen.value;
+  final RxMap<PageRegion, RxList<NavigationItem>> _regionStacks = {
+    PageRegion.left: <NavigationItem>[].obs,
+    PageRegion.right: <NavigationItem>[].obs,
+  }.obs;
 
-  final List<NavigationItem> _logicalStack = [];
+  List<NavigationItem> get logicalStack {
+    final merged = <NavigationItem>[];
+    final all = [
+      ..._regionStacks[PageRegion.left]!,
+      ..._regionStacks[PageRegion.right]!,
+    ];
 
-  List<NavigationItem> get logicalStack => List.unmodifiable(_logicalStack);
+    final grouped = <DateTime, List<NavigationItem>>{};
+    for (final item in all) {
+      grouped.putIfAbsent(item.groupId, () => []).add(item);
+    }
+
+    final sortedKeys = grouped.keys.toList()..sort();
+    for (final key in sortedKeys) {
+      merged.addAll(grouped[key]!);
+    }
+
+    return merged;
+  }
 
   @override
   void onInit() {
@@ -39,34 +46,14 @@ class LayoutRouter extends GetxService {
     _addInitialHomePageIfNeeded();
   }
 
-  void setScreenWidth(bool isWide) {
-    if (_isWideScreen.value != isWide) {
-      _isWideScreen.value = isWide;
-      _handleScreenSizeChange(isWide);
-    }
-  }
+  bool? _lastLayoutWide;
 
-  void _addInitialHomePageIfNeeded() {
-    if (_logicalStack.isEmpty) {
-      final home = RoutedPage(
-        pageKey: 'home',
-        region: PageRegion.left,
-        child: HomePage(region: PageRegion.left),
-      );
-      _logicalStack.add(NavigationItem(
-        page: home,
-        pageKey: 'home',
-        region: PageRegion.left,
-      ));
-      debugPrint("🏠 Added initial HomePage to logical stack");
-    }
-  }
-
-  void updateScreenSize(BuildContext context) {
-    final wide = MediaQuery.of(context).size.width >= 600;
-    if (_isWideScreen.value != wide) {
-      _isWideScreen.value = wide;
-      _handleScreenSizeChange(wide);
+  void handleLayoutChangeIfNeeded() {
+    final current = isWideScreen;
+    if (_lastLayoutWide == null || _lastLayoutWide != current) {
+      _lastLayoutWide = current;
+      debugPrint("🔄 Layout changed to ${current ? 'WIDE' : 'NARROW'}");
+      _handleScreenSizeChange(current);
     }
   }
 
@@ -78,64 +65,60 @@ class LayoutRouter extends GetxService {
     }
   }
 
-  void _restoreNarrowStack() {
-    _isTransitioningLayout = true;
-
-    debugPrint("🔁 Merging into narrow layout...");
-
-    // Clear first (main) navigator
+  void _clearNavigators() {
     while (firstKey.currentState?.canPop() == true) {
       firstKey.currentState!.pop();
     }
-
-    // Push all pages from logical stack into firstKey
-    for (int i = 1; i < _logicalStack.length; i++) {
-      debugPrint("📥 Rebuilding [${_logicalStack[i].pageKey}] into FIRST navigator (narrow)");
-    }
-
-    // Clear second (side) navigator just in case
     while (secondKey.currentState?.canPop() == true) {
       secondKey.currentState!.pop();
     }
-
-    _isTransitioningLayout = false;
-
-    printStack("Merged Stack (All regions):");
   }
 
+  void _restoreNarrowStack() {
+    _isTransitioningLayout = true;
+    debugPrint("🔁 Merging into narrow layout...");
+    _clearNavigators();
+    _isTransitioningLayout = false;
+    printStack("Merged Stack (Sorted)");
+  }
 
   void _splitWideStack() {
     _isTransitioningLayout = true;
-
     debugPrint("🔀 Splitting into wide layout...");
-
-    // Clear both navigator stacks
-    while (firstKey.currentState?.canPop() == true) {
-      firstKey.currentState!.pop();
-    }
-    while (secondKey.currentState?.canPop() == true) {
-      secondKey.currentState!.pop();
-    }
-
-    // Rebuild from the logical stack into two navigators
-    for (final item in _logicalStack) {
-      final nav = item.region == PageRegion.left ? firstKey : secondKey;
-      debugPrint("📥 Rebuilding [${item.pageKey}] into ${item.region.name.toUpperCase()} navigator");
-    }
-
+    _clearNavigators();
     _isTransitioningLayout = false;
-
-    printStack("After split:");
+    printStack("After split");
   }
 
+  void _addInitialHomePageIfNeeded() {
+    if (_regionStacks[PageRegion.left]!.isEmpty &&
+        _regionStacks[PageRegion.right]!.isEmpty) {
+      final home = RoutedPage(
+        pageKey: 'home',
+        region: PageRegion.left,
+        child: HomePage(region: PageRegion.left),
+      );
+      final now = DateTime.now();
+      _regionStacks[PageRegion.left]!.add(
+        NavigationItem(
+          page: home,
+          pageKey: 'home',
+          region: PageRegion.left,
+          pushedAt: now,
+          groupId: now,
+        ),
+      );
+      debugPrint("🏠 Added initial HomePage to left stack");
+    }
+  }
 
   void removePageFromStack(String pageKey, PageRegion region) {
     if (_isTransitioningLayout) {
-      debugPrint("🛑 Skipped removing [$pageKey] from $region due to layout transition");
+      debugPrint("⚠️ Skipped removing [$pageKey] from $region due to layout transition");
       return;
     }
-
-    _logicalStack.removeWhere((e) => e.pageKey == pageKey && e.region == region);
+    _regionStacks[region]!.removeWhere((e) => e.pageKey == pageKey);
+    _regionStacks.refresh();
     debugPrint("🗑️ Removed page [$pageKey] from $region");
     printStack("after remove");
   }
@@ -144,65 +127,62 @@ class LayoutRouter extends GetxService {
       Widget page, {
         required String pageKey,
         required PageRegion region,
+        DateTime? groupId,
       }) {
-    if (_isTransitioningLayout) return;
+    groupId ??= DateTime.now();
+    final routed = RoutedPage(pageKey: pageKey, region: region, child: page);
 
-    if (_logicalStack.any((e) => e.pageKey == pageKey && e.region == region)) {
-      debugPrint("⚠️ [$pageKey] already exists in $region stack, skipping push.");
-      return;
-    }
-
-    final routed = RoutedPage(
-      pageKey: pageKey,
-      region: region,
-      child: page,
+    _regionStacks[region]!.add(
+      NavigationItem(
+        page: routed,
+        pageKey: pageKey,
+        region: region,
+        pushedAt: DateTime.now(),
+        groupId: groupId,
+      ),
     );
-
-    final item = NavigationItem(page: routed, pageKey: pageKey, region: region);
-    _logicalStack.add(item);
-
-    final nav = isWideScreen
-        ? (region == PageRegion.left ? firstKey : secondKey)
-        : firstKey;
-
-    debugPrint("📦 Pushing [$pageKey] to ${nav == firstKey ? 'FIRST' : 'SECOND'} navigator");
-    nav.currentState?.push(MaterialPageRoute(builder: (_) => routed));
-
+    _regionStacks.refresh();
+    debugPrint("📦 Added [$pageKey] to $region stack");
     printStack("after push");
   }
 
+  void pushNested({
+    required Widget page,
+    required String pageKey,
+    required PageRegion region,
+  }) {
+    final groupId = getLastGroupIdForRegion(region);
+    push(page, pageKey: pageKey, region: region, groupId: groupId);
+  }
 
+  DateTime getLastGroupIdForRegion(PageRegion region) {
+    final stack = _regionStacks[region];
+    return (stack == null || stack.isEmpty) ? DateTime.now() : stack.last.groupId;
+  }
 
-
-  void pop() {
-    if (_logicalStack.isEmpty) return;
-
-    final last = _logicalStack.removeLast();
-    final nav = isWideScreen && last.region == PageRegion.right
-        ? secondKey
-        : firstKey;
-
-    nav.currentState?.maybePop();
-
-    // Check for duplicate key, remove both
-    if (_logicalStack.isNotEmpty) {
-      final prev = _logicalStack.last;
-      if (prev.pageKey == last.pageKey) {
-        _logicalStack.removeLast();
-        final prevNav = isWideScreen && prev.region == PageRegion.right
-            ? secondKey
-            : firstKey;
-        prevNav.currentState?.maybePop();
-      }
-    }
-
+  void pop(PageRegion region) {
+    final stack = _regionStacks[region]!;
+    if (stack.isEmpty) return;
+    final last = stack.removeLast();
+    _regionStacks.refresh();
+    debugPrint("🔙 Popped ${last.pageKey} from $region");
     printStack("after pop");
   }
 
   void printStack([String label = ""]) {
-    final full = _logicalStack.map((e) => '${e.pageKey} (${e.region.name})').toList();
+    final left = _regionStacks[PageRegion.left]!
+        .map((e) => '${e.pageKey} (L)')
+        .join(', ');
+    final right = _regionStacks[PageRegion.right]!
+        .map((e) => '${e.pageKey} (R)')
+        .join(', ');
+    final merged = logicalStack
+        .map((e) => '${e.pageKey} (${e.region.name})')
+        .join(', ');
 
     debugPrint("⬛️ Stack $label");
-    debugPrint("  🧠 Logical Stack: $full");
+    debugPrint("  🔹 Left: [$left]");
+    debugPrint("  🔸 Right: [$right]");
+    debugPrint("  🧠 Merged: [$merged]");
   }
 }

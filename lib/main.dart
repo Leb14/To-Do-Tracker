@@ -11,11 +11,9 @@ import 'controller/theme_controller.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  Get.put(LayoutRouter());
-  Get.put(ContentController());
-  Get.put(SelectedButtonController());
   Get.put(LayoutController());
-  Get.put(ThemeController());
+  Get.put(LayoutRouter());
+
   // Get.put(ScreenController());
   runApp(const MyApp());
 }
@@ -25,14 +23,10 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    final themeController = Get.find<ThemeController>();
-
-
-    return Obx(() => GetMaterialApp(
+    return GetMaterialApp(
       theme: ThemeData.light(),
       darkTheme: customDarkTheme,
-      themeMode: themeController.isDarkMode ? ThemeMode.dark : ThemeMode.light,
       home: const ResponsiveHomePage(),
-    ));
+    );
   }
 }
