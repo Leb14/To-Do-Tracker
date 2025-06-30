@@ -1,22 +1,32 @@
-// view_more_page.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../controller/layout_controller.dart';
+import '../navigation/router.dart'; // adjust import if needed
 
-class ViewDetailPage extends StatelessWidget {
-  const ViewDetailPage({super.key});
+class RoutedPage extends StatelessWidget {
+  final Widget child;
+  final String pageKey;
+  final PageRegion region;
+
+  const RoutedPage({
+    super.key,
+    required this.child,
+    required this.pageKey,
+    required this.region,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final layout = Get.find<LayoutController>();
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("View More", style: layout.titleStyle),
-      ),
-      body: Center(
-        child: Text("Here is more info about the button!", style: layout.contentStyle),
-      ),
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) {
+          debugPrint('📤 $pageKey popped from ${region.name} with result: $result');
+          final layout = Get.find<LayoutRouter>();
+          layout.removePageFromStack(pageKey, region);
+        }
+      },
+      child: child,
     );
   }
 }
+
