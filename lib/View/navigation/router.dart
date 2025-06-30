@@ -4,6 +4,7 @@ import 'package:untitled/View/enum/enum_page_region.dart';
 import 'package:untitled/View/navigation/navigation_item.dart';
 import 'package:untitled/View/pages/home_page.dart';
 import 'package:untitled/View/navigation/routed_page.dart';
+import 'package:untitled/View/pages/placeholder_page.dart';
 import 'package:untitled/controller/layout_controller.dart';
 
 class LayoutRouter extends GetxService {
@@ -15,10 +16,11 @@ class LayoutRouter extends GetxService {
   bool get isWideScreen => layoutController.isWide;
   bool _isTransitioningLayout = false;
 
-  final RxMap<PageRegion, RxList<NavigationItem>> _regionStacks = {
-    PageRegion.left: <NavigationItem>[].obs,
-    PageRegion.right: <NavigationItem>[].obs,
-  }.obs;
+  final RxMap<PageRegion, RxList<NavigationItem>> _regionStacks =
+      {
+        PageRegion.left: <NavigationItem>[].obs,
+        PageRegion.right: <NavigationItem>[].obs,
+      }.obs;
 
   List<NavigationItem> get logicalStack {
     final merged = <NavigationItem>[];
@@ -29,7 +31,8 @@ class LayoutRouter extends GetxService {
 
     final grouped = <DateTime, List<NavigationItem>>{};
     for (final item in all) {
-      grouped.putIfAbsent(item.groupId, () => []).add(item);
+      if (item.groupId == null) continue;
+      grouped.putIfAbsent(item.groupId!, () => []).add(item);
     }
 
     final sortedKeys = grouped.keys.toList()..sort();
@@ -91,17 +94,15 @@ class LayoutRouter extends GetxService {
   }
 
   void _addInitialHomePageIfNeeded() {
-    if (_regionStacks[PageRegion.left]!.isEmpty &&
-        _regionStacks[PageRegion.right]!.isEmpty) {
-      final home = RoutedPage(
-        pageKey: 'home',
-        region: PageRegion.left,
-        child: HomePage(region: PageRegion.left),
-      );
+    if (_regionStacks[PageRegion.left]!.isEmpty) {
       final now = DateTime.now();
       _regionStacks[PageRegion.left]!.add(
         NavigationItem(
-          page: home,
+          page: RoutedPage(
+            pageKey: 'home',
+            region: PageRegion.left,
+            child: HomePage(region: PageRegion.left),
+          ),
           pageKey: 'home',
           region: PageRegion.left,
           pushedAt: now,
@@ -110,11 +111,31 @@ class LayoutRouter extends GetxService {
       );
       debugPrint("🏠 Added initial HomePage to left stack");
     }
+
+    if (_regionStacks[PageRegion.right]!.isEmpty) {
+      // Add placeholder with no groupId or special marker
+      _regionStacks[PageRegion.right]!.add(
+        NavigationItem(
+          page: const RoutedPage(
+            pageKey: 'placeholder',
+            region: PageRegion.right,
+            child: PlaceholderPage(title: 'Right Pane'),
+          ),
+          pageKey: 'placeholder',
+          region: PageRegion.right,
+          pushedAt: DateTime.now(),
+          groupId: null,
+        ),
+      );
+      debugPrint("🧩 Added initial Placeholder to right stack");
+    }
   }
 
   void removePageFromStack(String pageKey, PageRegion region) {
     if (_isTransitioningLayout) {
-      debugPrint("⚠️ Skipped removing [$pageKey] from $region due to layout transition");
+      debugPrint(
+        "⚠️ Skipped removing [$pageKey] from $region due to layout transition",
+      );
       return;
     }
     _regionStacks[region]!.removeWhere((e) => e.pageKey == pageKey);
@@ -124,15 +145,26 @@ class LayoutRouter extends GetxService {
   }
 
   void push(
-      Widget page, {
-        required String pageKey,
-        required PageRegion region,
-        DateTime? groupId,
-      }) {
+    Widget page, {
+    required String pageKey,
+    required PageRegion region,
+    DateTime? groupId,
+  }) {
+    final stack = _regionStacks[region]!;
+
+    // ✅ 防止重复 push 相同 pageKey
+    final isDuplicate = stack.any((item) => item.pageKey == pageKey);
+    if (isDuplicate) {
+      debugPrint(
+        "⚠️ [$pageKey] already exists in $region stack. Skipping push.",
+      );
+      return;
+    }
+
     groupId ??= DateTime.now();
     final routed = RoutedPage(pageKey: pageKey, region: region, child: page);
 
-    _regionStacks[region]!.add(
+    stack.add(
       NavigationItem(
         page: routed,
         pageKey: pageKey,
@@ -157,7 +189,10 @@ class LayoutRouter extends GetxService {
 
   DateTime getLastGroupIdForRegion(PageRegion region) {
     final stack = _regionStacks[region];
-    return (stack == null || stack.isEmpty) ? DateTime.now() : stack.last.groupId;
+    final lastGroupId =
+        (stack == null || stack.isEmpty) ? null : stack.last.groupId;
+
+    return lastGroupId ?? DateTime.now(); // ✅ fallback
   }
 
   void pop(PageRegion region) {

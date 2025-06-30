@@ -33,7 +33,7 @@ class HomePage extends StatelessWidget {
               layout.push(
                 const SettingsPage(),
                 pageKey: 'settings',
-                region: PageRegion.left,
+                region: PageRegion.right,
               );
             },
           ),
