@@ -89,6 +89,25 @@ class LayoutRouter extends GetxService {
     _isTransitioningLayout = true;
     debugPrint("🔀 Splitting into wide layout...");
     _clearNavigators();
+
+    if (_regionStacks[PageRegion.right]!.isEmpty) {
+      // Add placeholder with no groupId or special marker
+      _regionStacks[PageRegion.right]!.add(
+        NavigationItem(
+          page: const RoutedPage(
+            pageKey: 'placeholder',
+            region: PageRegion.right,
+            child: PlaceholderPage(title: 'Right Pane'),
+          ),
+          pageKey: 'placeholder',
+          region: PageRegion.right,
+          pushedAt: DateTime.now(),
+          groupId: null,
+        ),
+      );
+      debugPrint("🧩 Added initial Placeholder to right stack");
+    }
+
     _isTransitioningLayout = false;
     printStack("After split");
   }
@@ -110,24 +129,6 @@ class LayoutRouter extends GetxService {
         ),
       );
       debugPrint("🏠 Added initial HomePage to left stack");
-    }
-
-    if (_regionStacks[PageRegion.right]!.isEmpty) {
-      // Add placeholder with no groupId or special marker
-      _regionStacks[PageRegion.right]!.add(
-        NavigationItem(
-          page: const RoutedPage(
-            pageKey: 'placeholder',
-            region: PageRegion.right,
-            child: PlaceholderPage(title: 'Right Pane'),
-          ),
-          pageKey: 'placeholder',
-          region: PageRegion.right,
-          pushedAt: DateTime.now(),
-          groupId: null,
-        ),
-      );
-      debugPrint("🧩 Added initial Placeholder to right stack");
     }
   }
 
@@ -152,7 +153,6 @@ class LayoutRouter extends GetxService {
   }) {
     final stack = _regionStacks[region]!;
 
-    // ✅ 防止重复 push 相同 pageKey
     final isDuplicate = stack.any((item) => item.pageKey == pageKey);
     if (isDuplicate) {
       debugPrint(
@@ -162,6 +162,12 @@ class LayoutRouter extends GetxService {
     }
 
     groupId ??= DateTime.now();
+
+    if (region == PageRegion.right) {
+        final rightStack = _regionStacks[PageRegion.right]!;
+        rightStack.removeWhere((item) => item.groupId != null && item.groupId != groupId);
+    }
+
     final routed = RoutedPage(pageKey: pageKey, region: region, child: page);
 
     stack.add(
@@ -192,7 +198,7 @@ class LayoutRouter extends GetxService {
     final lastGroupId =
         (stack == null || stack.isEmpty) ? null : stack.last.groupId;
 
-    return lastGroupId ?? DateTime.now(); // ✅ fallback
+    return lastGroupId ?? DateTime.now();
   }
 
   void pop(PageRegion region) {
@@ -206,7 +212,7 @@ class LayoutRouter extends GetxService {
 
   void printStack([String label = ""]) {
     final left = _regionStacks[PageRegion.left]!
-        .map((e) => '${e.pageKey} (L)')
+        .map((e) => '${e.pageKey} (L) ${e.groupId}')
         .join(', ');
     final right = _regionStacks[PageRegion.right]!
         .map((e) => '${e.pageKey} (R)')

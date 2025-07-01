@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:untitled/View/enum/enum_page_region.dart';
 import 'package:untitled/View/pages/placeholder_page.dart';
 import 'package:untitled/View/navigation/routed_page.dart';
+import 'package:untitled/View/region_scope.dart';
 import 'package:untitled/controller/layout_controller.dart';
 import '../navigation/router.dart';
 
@@ -11,7 +12,7 @@ class ResponsiveHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final layout = Get.find<LayoutRouter>();
+    final router = Get.find<LayoutRouter>();
     final layoutController = Get.find<LayoutController>();
 
     debugPrint("🔄 ResponsiveHomePage.build called");
@@ -19,12 +20,10 @@ class ResponsiveHomePage extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         layoutController.updateSize(constraints.maxWidth);
-        layout.handleLayoutChangeIfNeeded();
+        router.handleLayoutChangeIfNeeded();
         final isWide = layoutController.isWide;
 
-        return isWide
-            ? _buildWideLayout(layout)
-            : _buildNarrowLayout(layout);
+        return isWide ? _buildWideLayout(router) : _buildNarrowLayout(router);
       },
     );
   }
@@ -32,9 +31,9 @@ class ResponsiveHomePage extends StatelessWidget {
   Widget _buildWideLayout(LayoutRouter layout) {
     return Row(
       children: [
-        Expanded(child: _buildNavigator(layout, PageRegion.left)),
+        Expanded(flex: 2, child: _buildNavigator(layout, PageRegion.left)),
         const VerticalDivider(width: 1),
-        Expanded(child: _buildNavigator(layout, PageRegion.right)),
+        Expanded(flex: 3, child: _buildNavigator(layout, PageRegion.right)),
       ],
     );
   }
@@ -43,33 +42,40 @@ class ResponsiveHomePage extends StatelessWidget {
     return _buildNavigator(layout, PageRegion.left, useMergedStack: true);
   }
 
-  Widget _buildNavigator(LayoutRouter layout, PageRegion region,
-      {bool useMergedStack = false}) {
+  Widget _buildNavigator(
+    LayoutRouter layout,
+    PageRegion region, {
+    bool useMergedStack = false,
+  }) {
     return Obx(() {
-      final pages = useMergedStack
-          ? layout.logicalStack
-          : layout.logicalStack.where((e) => e.region == region).toList();
+      final pages =
+          useMergedStack
+              ? layout.logicalStack
+              : layout.logicalStack.where((e) => e.region == region).toList();
 
-      final pageList = pages.isEmpty && region == PageRegion.right
-          ? [
-        const MaterialPage(
-          key: ValueKey('placeholder'),
-          child: RoutedPage(
-            pageKey: 'placeholder',
-            region: PageRegion.right,
-            child: PlaceholderPage(title: 'Right Pane'),
-          ),
-        ),
-      ]
-          : pages
-          .map((item) => MaterialPage(
-        key: ValueKey(item.pageKey),
-        child: item.page,
-      ))
-          .toList();
+      final pageList =
+          pages.isEmpty && region == PageRegion.right
+              ? [
+                const MaterialPage(
+                  key: ValueKey('placeholder'),
+                  child: RoutedPage(
+                    pageKey: 'placeholder',
+                    region: PageRegion.right,
+                    child: PlaceholderPage(title: 'Right Pane'),
+                  ),
+                ),
+              ]
+              : pages
+                  .map(
+                    (item) => MaterialPage(
+                      key: ValueKey(item.pageKey),
+                      child: RegionScope(region: region, child: item.page),
+                    ),
+                  )
+                  .toList();
 
       final navKey =
-      (region == PageRegion.left) ? layout.firstKey : layout.secondKey;
+          (region == PageRegion.left) ? layout.firstKey : layout.secondKey;
 
       return Navigator(
         key: navKey,

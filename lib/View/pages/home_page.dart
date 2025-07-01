@@ -1,41 +1,46 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:untitled/View/enum/enum_page_region.dart';
-import 'package:untitled/View/navigation/router.dart';
+import 'package:untitled/View/pages/main_page.dart';
 import 'package:untitled/View/pages/setting_page.dart';
 import 'package:untitled/View/pages/view_image_page.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   final PageRegion region;
   const HomePage({super.key, required this.region});
 
   @override
-  Widget build(BuildContext context) {
-    final layout = Get.find<LayoutRouter>();
+  State<HomePage> createState() => _HomePageState();
+}
 
+class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
+
+  static const List<Widget> _tabs = [
+    MainPage(),
+    SettingsPage(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Home')),
-      body: ListView(
-        children: [
-          ListTile(
-            title: const Text('View Image'),
-            onTap: () {
-              layout.push(
-                const ViewImagePage(),
-                pageKey: 'viewImage',
-                region: PageRegion.right,
-              );
-            },
+      body: _tabs[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Main',
           ),
-          ListTile(
-            title: const Text('Settings'),
-            onTap: () {
-              layout.push(
-                const SettingsPage(),
-                pageKey: 'settings',
-                region: PageRegion.right,
-              );
-            },
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
           ),
         ],
       ),

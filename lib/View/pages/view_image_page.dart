@@ -14,15 +14,51 @@ class ViewImagePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('View Image')),
       body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            layout.pushNested(
-              pageKey: 'imageDetail',
-              region: PageRegion.right,
-              page: const ImageDetailPage(),
-            );
-          },
-          child: const Text('Go to Detail'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                layout.pushNested(
+                  pageKey: 'imageDetail',
+                  region: PageRegion.right,
+                  page: const ImageDetailPage(backgroundColor: Colors.pink),
+                );
+              },
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.all(Colors.pink),
+              ),
+              child: const Text('Pink', style: TextStyle(color: Colors.white)),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                layout.pushNested(
+                  pageKey: 'imageDetail',
+                  region: PageRegion.right,
+                  page: const ImageDetailPage(backgroundColor: Colors.black),
+                );
+              },
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.all(Colors.black),
+              ),
+              child: const Text('Black', style: TextStyle(color: Colors.white)),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                layout.pushNested(
+                  pageKey: 'imageDetail',
+                  region: PageRegion.right,
+                  page: const ImageDetailPage(backgroundColor: Colors.yellow),
+                );
+              },
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.all(Colors.yellow),
+              ),
+              child: const Text('Yellow', style: TextStyle(color: Colors.black)),
+            ),
+          ],
         ),
       ),
     );

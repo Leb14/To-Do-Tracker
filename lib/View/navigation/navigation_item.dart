@@ -7,7 +7,7 @@ class NavigationItem {
   final String pageKey;
   final PageRegion region;
   final DateTime pushedAt;
-  final DateTime? groupId; // 🆕 追加分组时间（用于合并逻辑）
+  final DateTime? groupId;
 
   NavigationItem({
     required this.page,
