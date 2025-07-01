@@ -22,7 +22,7 @@ class ViewImagePage extends StatelessWidget {
                 layout.pushNested(
                   pageKey: 'imageDetail',
                   region: PageRegion.right,
-                  page: const ImageDetailPage(backgroundColor: Colors.pink),
+                  page: const ImageDetailPage(backgroundColor: Colors.pink, fontColor: Colors.black),
                 );
               },
               style: ButtonStyle(
@@ -36,7 +36,7 @@ class ViewImagePage extends StatelessWidget {
                 layout.pushNested(
                   pageKey: 'imageDetail',
                   region: PageRegion.right,
-                  page: const ImageDetailPage(backgroundColor: Colors.black),
+                  page: const ImageDetailPage(backgroundColor: Colors.black, fontColor: Colors.white),
                 );
               },
               style: ButtonStyle(
@@ -50,7 +50,7 @@ class ViewImagePage extends StatelessWidget {
                 layout.pushNested(
                   pageKey: 'imageDetail',
                   region: PageRegion.right,
-                  page: const ImageDetailPage(backgroundColor: Colors.yellow),
+                  page: const ImageDetailPage(backgroundColor: Colors.yellow, fontColor: Colors.black),
                 );
               },
               style: ButtonStyle(

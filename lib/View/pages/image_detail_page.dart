@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 class ImageDetailPage extends StatelessWidget {
   final Color backgroundColor;
+  final Color fontColor;
 
   const ImageDetailPage({
     super.key,
     required this.backgroundColor,
+    required this.fontColor
   });
 
   @override
@@ -13,7 +15,7 @@ class ImageDetailPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(title: const Text('Image Detail')),
-      body: const Center(child: Text('Detail Info')),
+      body: Center(child: Text('Detail Info', style: TextStyle(color: fontColor),)),
     );
   }
 }
