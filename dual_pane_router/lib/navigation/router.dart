@@ -178,15 +178,6 @@ class LayoutRouter extends GetxService {
       final normalizedTop = currentTopKey.replaceAll(RegExp(r'^/+|/+$'), '');
       final normalizedNew = path.replaceAll(RegExp(r'^/+|/+$'), '');
 
-      final isChild = normalizedNew.startsWith('$normalizedTop/')
-          && normalizedNew != normalizedTop;
-
-      if (!isChild && normalizedTop != normalizedNew) {
-        debugPrint("⛔️ Blocked navigation: [$path] is not a child of [$currentTopKey]");
-        return; // ❌ Cancel navigation
-      }
-
-      // Optional: clear stack if switching branches under same parent
       if (!normalizedNew.startsWith('$normalizedTop/')) {
         stack.clear();
         debugPrint("🧹 Cleared $region stack for new branch $normalizedNew");
