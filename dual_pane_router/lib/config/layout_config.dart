@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+part of '../../dual_pane_router.dart';
 
 class LayoutConfig {
   static const double wideScreenBreakpoint = 890;

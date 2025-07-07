@@ -1,16 +1,11 @@
+import 'package:dual_pane_router/dual_pane_router.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:untitled/View/enum/enum_page_region.dart';
-import 'package:untitled/View/navigation/router.dart';
-import 'package:untitled/View/pages/image_detail_page.dart';
 
-class ViewImagePage extends StatelessWidget {
-  const ViewImagePage({super.key});
+class ViewImagePage extends BaseRightRegionPage {
+  const ViewImagePage({super.key}) : super(pageKey: 'main/view-image');
 
   @override
-  Widget build(BuildContext context) {
-    final layout = Get.find<LayoutRouter>();
+  Widget buildPage(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('View Image')),
       body: Center(
@@ -19,39 +14,36 @@ class ViewImagePage extends StatelessWidget {
           children: [
             ElevatedButton(
               onPressed: () {
-                layout.pushNested(
-                  pageKey: 'imageDetail',
-                  region: PageRegion.right,
-                  page: const ImageDetailPage(backgroundColor: Colors.pink, fontColor: Colors.black),
-                );
+                router.pushNamed('main/view-image/image-detail', parameters: {
+                  'bg': Colors.pink,
+                  'fg': Colors.black,
+                });
               },
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.all(Colors.pink),
               ),
               child: const Text('Pink', style: TextStyle(color: Colors.white)),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                layout.pushNested(
-                  pageKey: 'imageDetail',
-                  region: PageRegion.right,
-                  page: const ImageDetailPage(backgroundColor: Colors.black, fontColor: Colors.white),
-                );
+                router.pushNamed('main/view-image/image-detail', parameters: {
+                  'bg': Colors.black,
+                  'fg': Colors.white,
+                });
               },
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.all(Colors.black),
               ),
               child: const Text('Black', style: TextStyle(color: Colors.white)),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                layout.pushNested(
-                  pageKey: 'imageDetail',
-                  region: PageRegion.right,
-                  page: const ImageDetailPage(backgroundColor: Colors.yellow, fontColor: Colors.black),
-                );
+                router.pushNamed('main/view-image/image-detail', parameters: {
+                  'bg': Colors.yellow,
+                  'fg': Colors.black,
+                });
               },
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.all(Colors.yellow),

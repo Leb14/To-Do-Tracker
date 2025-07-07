@@ -129,6 +129,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.4.5"
+  dual_pane_router:
+    dependency: "direct main"
+    description:
+      path: dual_pane_router
+      relative: true
+    source: path
+    version: "0.0.1"
   exception_templates:
     dependency: transitive
     description:

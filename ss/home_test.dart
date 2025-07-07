@@ -2,7 +2,7 @@
 // import 'package:get/get.dart';
 //
 // import '../components/custom_button.dart';
-// import '../navigation/router.dart';
+// import '../navigation/dual_pane_router.dart';
 // import 'add_task_page.dart';
 //
 // class HomePage extends StatelessWidget {

@@ -1,7 +1,7 @@
 // import 'package:get/get.dart';
 // import 'package:untitled/controller/content_controller.dart';
 // import 'package:untitled/View/pages/desc_page.dart';
-// import 'package:untitled/View/navigation/router.dart';
+// import 'package:untitled/View/navigation/dual_pane_router.dart';
 // import 'package:untitled/controller/selected_button_controller.dart';
 //
 // import '../View/pages/extra_page.dart';

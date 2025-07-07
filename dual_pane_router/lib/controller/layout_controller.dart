@@ -1,7 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-
-import '../View/config/layout_config.dart';
+part of '../../dual_pane_router.dart';
 
 class LayoutController extends GetxController {
   double screenWidth = 0;

@@ -1,20 +1,20 @@
+import 'package:dual_pane_router/dual_pane_router.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:untitled/View/pages/responsive_home.dart';
-import 'package:untitled/controller/content_controller.dart';
-import 'package:untitled/controller/layout_controller.dart';
-import 'package:untitled/controller/selected_button_controller.dart';
-
-import 'View/navigation/router.dart';
+import 'package:untitled/View/pages/placeholder_page.dart';
+import 'View/pages/home_page.dart';
+import 'View/route/route.dart';
 import 'View/theme/dark_theme.dart';
-import 'controller/theme_controller.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  Get.put(LayoutController());
-  Get.put(LayoutRouter());
 
-  // Get.put(ScreenController());
+  LayoutRouter.instance.initialize(
+    routes: appRoutes,
+    left: const HomePage(),
+    right: const PlaceholderPage(title: "Default Right"),
+  );
+
   runApp(const MyApp());
 }
 
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       theme: ThemeData.light(),
       darkTheme: customDarkTheme,
-      home: const ResponsiveHomePage(),
+      home: LayoutRouter.instance.home,
     );
   }
 }

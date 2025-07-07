@@ -1,28 +1,19 @@
+import 'package:dual_pane_router/dual_pane_router.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:untitled/View/enum/enum_page_region.dart';
-import 'package:untitled/View/navigation/router.dart';
-import 'package:untitled/View/pages/view_image_page.dart';
 
-class MainPage extends StatelessWidget {
-  const MainPage({super.key});
+class MainPage extends BaseLeftRegionPage {
+  const MainPage({super.key}) : super(pageKey: 'main');
 
   @override
-  Widget build(BuildContext context) {
-    final router = Get.find<LayoutRouter>();
-
+  Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Home")),
+      appBar: AppBar(title: const Text("Home")),
       body: Center(
         child: ElevatedButton(
           onPressed: () {
-            router.push(
-              const ViewImagePage(),
-              region: PageRegion.right,
-              pageKey: 'viewImage',
-            );
+            router.pushNamed('main/view-image');
           },
-          child: Text("View Image"),
+          child: const Text("View Image"),
         ),
       ),
     );

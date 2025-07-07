@@ -4,7 +4,7 @@
 //
 // import '../../controller/layout_controller.dart';
 // import '../component/description_pane.dart';
-// import '../navigation/router.dart';
+// import '../navigation/dual_pane_router.dart';
 //
 // class DescriptionPage extends StatelessWidget {
 //   final String title;

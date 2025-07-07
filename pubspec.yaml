@@ -42,7 +42,8 @@ dependencies:
   protobuf: ^4.1.0
   protoc_plugin: ^22.3.0
   lakos: ^2.0.6
-
+  dual_pane_router:
+    path: ./dual_pane_router
 dev_dependencies:
   flutter_test:
     sdk: flutter

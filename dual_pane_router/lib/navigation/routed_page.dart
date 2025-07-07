@@ -1,7 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:untitled/View/enum/enum_page_region.dart';
-import 'package:untitled/View/navigation/router.dart' show LayoutRouter;
+part of '../../dual_pane_router.dart';
 
 class RoutedPage extends StatelessWidget {
   final Widget child;

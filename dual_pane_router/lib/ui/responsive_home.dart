@@ -1,11 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:untitled/View/enum/enum_page_region.dart';
-import 'package:untitled/View/pages/placeholder_page.dart';
-import 'package:untitled/View/navigation/routed_page.dart';
-import 'package:untitled/View/region_scope.dart';
-import 'package:untitled/controller/layout_controller.dart';
-import '../navigation/router.dart';
+part of '../../dual_pane_router.dart';
 
 class ResponsiveHomePage extends StatelessWidget {
   const ResponsiveHomePage({super.key});
@@ -54,28 +47,28 @@ class ResponsiveHomePage extends StatelessWidget {
               : layout.logicalStack.where((e) => e.region == region).toList();
 
       final pageList =
-          pages.isEmpty && region == PageRegion.right
-              ? [
-                const MaterialPage(
-                  key: ValueKey('placeholder'),
-                  child: RoutedPage(
-                    pageKey: 'placeholder',
-                    region: PageRegion.right,
-                    child: PlaceholderPage(title: 'Right Pane'),
-                  ),
+          // pageListpages.isEmpty && region == PageRegion.right
+          //     ? [
+          //       const MaterialPage(
+          //         key: ValueKey('placeholder'),
+          //         child: RoutedPage(
+          //           pageKey: 'placeholder',
+          //           region: PageRegion.right,
+          //           child: PlaceholderPage(title: 'Right Pane'),
+          //         ),
+          //       ),
+          //     ]
+          pages
+              .map(
+                (item) => MaterialPage(
+                  key: ValueKey(item.pageKey),
+                  child: item as Widget,
                 ),
-              ]
-              : pages
-                  .map(
-                    (item) => MaterialPage(
-                      key: ValueKey(item.pageKey),
-                      child: RegionScope(region: region, child: item.page),
-                    ),
-                  )
-                  .toList();
+              )
+              .toList();
 
       final navKey =
-          (region == PageRegion.left) ? layout.firstKey : layout.secondKey;
+          (region == PageRegion.left) ? layout.rightKey : layout.secondKey;
 
       return Navigator(
         key: navKey,
@@ -90,5 +83,20 @@ class ResponsiveHomePage extends StatelessWidget {
         },
       );
     });
+  }
+}
+
+class NoTransitionsBuilder extends PageTransitionsBuilder {
+  const NoTransitionsBuilder();
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    return child;
   }
 }
